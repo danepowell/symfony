@@ -1164,7 +1164,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertSame('../../../', $this->filesystem->makePathRelative('var/lib/symfony/', '/var/lib/symfony/src/Symfony/Component'));
     }
 
-    public function testMirrorOriginIterator(): void
+    public function testMirrorOriginIterator()
     {
         $sourcePath = $this->workspace.\DIRECTORY_SEPARATOR.'source'.\DIRECTORY_SEPARATOR;
         $targetPath = $this->workspace.\DIRECTORY_SEPARATOR.'target'.\DIRECTORY_SEPARATOR;
@@ -1186,7 +1186,7 @@ class FilesystemTest extends FilesystemTestCase
         self::assertFileDoesNotExist($targetFile2);
     }
 
-    public function testMirrorTargetIterator(): void
+    public function testMirrorTargetIterator()
     {
         $sourcePath = $this->workspace.\DIRECTORY_SEPARATOR.'source'.\DIRECTORY_SEPARATOR;
         $targetPath = $this->workspace.\DIRECTORY_SEPARATOR.'target'.\DIRECTORY_SEPARATOR;
@@ -1201,7 +1201,7 @@ class FilesystemTest extends FilesystemTestCase
         $targetIterator = Finder::create();
         $targetIterator->files()->in($targetPath)->name('file2');
 
-        $this->filesystem->mirror($sourcePath, $targetPath, NULL, ['delete' => true], $targetIterator);
+        $this->filesystem->mirror($sourcePath, $targetPath, null, ['delete' => true], $targetIterator);
 
         self::assertFileExists($targetFile1);
         self::assertFileDoesNotExist($targetFile2);
