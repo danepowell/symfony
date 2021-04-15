@@ -519,7 +519,7 @@ class Filesystem
      *
      * @param string            $originDir      The origin directory
      * @param string            $targetDir      The target directory
-     * @param \Traversable|null $originIterator Iterator that filters which files and directories to copy, if null a recursive iterator is created
+     * @param \Traversable|null $iterator       Iterator that filters which files and directories to copy, if null a recursive iterator is created
      * @param array             $options        An array of boolean options
      *                                          Valid options are:
      *                                          - $options['override'] If true, target files newer than origin files are overwritten (see copy(), defaults to false)
@@ -529,7 +529,7 @@ class Filesystem
      *
      * @throws IOException When file type is unknown
      */
-    public function mirror($originDir, $targetDir, \Traversable $originIterator = null, $options = [], \Traversable $targetIterator = null)
+    public function mirror($originDir, $targetDir, \Traversable $iterator = null, $options = [] /*\Traversable $targetIterator = null*/)
     {
         $targetDir = rtrim($targetDir, '/\\');
         $originDir = rtrim($originDir, '/\\');
@@ -541,7 +541,7 @@ class Filesystem
 
         // Iterate in destination folder to remove obsolete entries
         if ($this->exists($targetDir) && isset($options['delete']) && $options['delete']) {
-            $deleteIterator = $targetIterator;
+            $deleteIterator = func_num_args() === 5 ? func_get_arg(4) : $iterator;
             if (null === $deleteIterator) {
                 $flags = \FilesystemIterator::SKIP_DOTS;
                 $deleteIterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($targetDir, $flags), \RecursiveIteratorIterator::CHILD_FIRST);
@@ -557,15 +557,15 @@ class Filesystem
 
         $copyOnWindows = $options['copy_on_windows'] ?? false;
 
-        if (null === $originIterator) {
+        if (null === $iterator) {
             $flags = $copyOnWindows ? \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS : \FilesystemIterator::SKIP_DOTS;
-            $originIterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($originDir, $flags), \RecursiveIteratorIterator::SELF_FIRST);
+            $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($originDir, $flags), \RecursiveIteratorIterator::SELF_FIRST);
         }
 
         $this->mkdir($targetDir);
         $filesCreatedWhileMirroring = [];
 
-        foreach ($originIterator as $file) {
+        foreach ($iterator as $file) {
             if ($file->getPathname() === $targetDir || $file->getRealPath() === $targetDir || isset($filesCreatedWhileMirroring[$file->getRealPath()])) {
                 continue;
             }
